@@ -2,10 +2,16 @@ import mlx_whisper
 import numpy as np
 
 
+MODEL_ID = "mlx-community/whisper-small-mlx"
+
+def preload():
+    transcribe(np.zeros(16000, dtype=np.float32))
+
+
 def transcribe(audio="test.wav"):
     if isinstance(audio, np.ndarray) and audio.dtype != np.float32:
         audio = audio.astype(np.float32) / 32768.0
-    return mlx_whisper.transcribe(audio, path_or_hf_repo="mlx-community/whisper-small-mlx", language="en")["text"]
+    return mlx_whisper.transcribe(audio, path_or_hf_repo=MODEL_ID, language="en")["text"]
 
 
 def main(path="test.wav"):
