@@ -1,6 +1,12 @@
+import contextlib
+import io
+import warnings
+
 import numpy as np
 import sounddevice as sd
 from mlx_audio.tts.utils import load_model
+
+warnings.filterwarnings("ignore", message=".*torch.jit.script.*", category=FutureWarning)
 
 
 MODEL_ID = "mlx-community/Kokoro-82M-bf16"  # or .../Kokoro-82M-4bit
@@ -11,15 +17,22 @@ def preload():
     global _model
     if _model is None:
         _model = load_model(MODEL_ID)
+        # Warm up: KokoroPipeline is created lazily on first generate()
+        # (and prints noise). Force it now so first real speak is fast + quiet.
+        with contextlib.redirect_stdout(io.StringIO()):
+            for _ in _model.generate(text="hi", voice="af_heart", speed=1.0, lang_code="a"):
+                break
     return _model
 
 
 def speak(text, voice="af_heart", speed=1.0, lang_code="a"):
     model = preload()
-    for chunk in model.generate(text=text, voice=voice, speed=speed, lang_code=lang_code):
-        audio = np.asarray(chunk.audio, dtype=np.float32)
-        sd.play(audio, samplerate=chunk.sample_rate)
-        sd.wait()
+    with contextlib.redirect_stdout(io.StringIO()):
+        chunks = model.generate(text=text, voice=voice, speed=speed, lang_code=lang_code)
+        for chunk in chunks:
+            audio = np.asarray(chunk.audio, dtype=np.float32)
+            sd.play(audio, samplerate=chunk.sample_rate)
+            sd.wait()
 
 
 def main(text="Systems online. How can I help?"):
