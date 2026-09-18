@@ -12,14 +12,11 @@ class Message(BaseModel):
 
 _model, _tokenizer = None, None
 
-def _get():
+def preload():
     global _model, _tokenizer
     if _model is None:
         _model, _tokenizer = load(MODEL_ID)
     return _model, _tokenizer
-
-def preload():
-    return _get()
 
 def chat(messages: list[Message | dict], max_tokens=512):
     model, tokenizer = preload()

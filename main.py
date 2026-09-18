@@ -3,7 +3,7 @@ import webrtcvad  # uv pip install webrtcvad-wheels
 from rich.console import Console
 from rich.panel import Panel
 from stt import transcribe, preload as preload_stt
-from brain import chat, preload as preload_brain
+from llm import chat, preload as preload_brain
 from tts import speak, preload as preload_tts
 
 console = Console()
@@ -52,7 +52,7 @@ def main(device=None):
         preload_stt()
         console.log("STT ready")
         preload_brain()
-        console.log("Brain ready")
+        console.log("LLM ready")
         preload_tts()
         console.log("TTS ready")
     console.print(f"[bold green]● Ready[/bold green] [dim]({(time.monotonic() - t0):.1f}s, Ctrl+C to quit)[/dim]")
