@@ -68,8 +68,8 @@ xcode-select --install
 which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
 brew install ffmpeg portaudio
 
-# 3. Make the venv + install everything (Python 3.11, pls)
-cd ~/Documents/Github/jarvis
+# 3. Clone it, then install everything (Python 3.11, pls)
+git clone https://github.com/sharathkrml/jarvis.git && cd jarvis
 uv sync
 
 # 4. Make sure GPU + mic actually show up

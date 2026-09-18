@@ -36,7 +36,7 @@ brew install ffmpeg portaudio  # portaudio builds pyaudio
 ## 2. Env
 
 ```bash
-cd ~/Documents/Github/jarvis
+cd jarvis
 uv venv --python 3.11 .venv && source .venv/bin/activate
 uv pip install mlx-lm mlx-audio mlx-whisper sounddevice numpy scipy pyaudio "misaki[en]" webrtcvad-wheels
 uv run python -c "import mlx.core as mx; print(mx.default_device())"  # expect Device(gpu, 0)
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 ```
 
 ```bash
-uv run --project ~/Documents/Github/jarvis python jarvis.py
+uv run python jarvis.py
 ```
 Knobs in order: `LLM_MODEL` → 1.7B if laggy; keep history ≤6 turns; `max_tokens` 100-150; TTS `-4bit` if memory yellow.
 
