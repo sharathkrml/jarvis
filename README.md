@@ -119,6 +119,7 @@ So changing a model = editing `.env`. No code touched.
 LLM_MODEL=mlx-community/Qwen3-4B-Instruct-2507-4bit   # or Qwen3-1.7B-4bit for speed
 STT_MODEL=mlx-community/parakeet-tdt-0.6b-v2          # or whisper-small-mlx for tiny
 TTS_MODEL=mlx-community/Kokoro-82M-bf16               # or Kokoro-82M-4bit if memory's tight
+JARVIS_BASH=safe                                       # "full" lets Jarvis run any shell command
 ```
 
 Other knobs, if you're feeling custom:
@@ -199,7 +200,7 @@ nobody drifts off 3.11. Only libraries published to PyPI git-ignore `uv.lock`.
 ## Later-ish (not built yet)
 
 - [ ] Keep only the last ~6 turns of chat history so it doesn't hoard memory.
-- [ ] Tool calling (let it check the time, run safe commands). Idea sketched in `jarvis.md` §5.
+- [x] Tool calling (let it check the time, run safe commands). See `tools.py`.
 - [ ] Stream the TTS sentence-by-sentence so it talks before it's done thinking.
 - [ ] Barge-in — let you interrupt it mid-sentence.
 - [ ] Wake word, so it only wakes up when you say "Hey Jarvis".

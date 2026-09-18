@@ -3,7 +3,7 @@ import webrtcvad  # uv pip install webrtcvad-wheels
 from rich.console import Console
 from rich.panel import Panel
 from stt import transcribe, preload as preload_stt
-from llm import chat, preload as preload_brain
+from llm import chat_with_tools, preload as preload_brain
 from tts import speak, preload as preload_tts
 
 console = Console()
@@ -13,6 +13,11 @@ SYSTEM_PROMPT = ("You are Jarvis, a concise voice assistant running fully on-dev
           "Reply in 1-2 short sentences, plain speech, no markdown, no lists. ")
 
 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+
+def show_tool(name, args, result):
+    console.print(Panel(f"[dim]{name}[/dim] {args}\n[yellow]{result}[/yellow]",
+                        title="Tool", border_style="yellow", expand=False))
 
 def record_utterance(device=None):
     vad = webrtcvad.Vad(3)
@@ -75,7 +80,7 @@ def main(device=None):
         messages.append({"role": "user", "content": text})
         with console.status("Thinking…", spinner="dots"):
             t0 = time.monotonic()
-            response = chat(messages)
+            response = chat_with_tools(messages, on_tool=show_tool)
         messages.append({"role": "assistant", "content": response})
         console.print(Panel(response, title=f"Jarvis [dim]({(time.monotonic() - t0):.1f}s)[/dim]", border_style="green", expand=False))
         speak(response)
