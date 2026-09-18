@@ -1,17 +1,32 @@
-import mlx_whisper
+import mlx.core as mx
 import numpy as np
+from mlx_audio.stt import load
+
+from config import env
 
 
-MODEL_ID = "mlx-community/whisper-small-mlx"
+MODEL_ID = env("STT_MODEL", "mlx-community/parakeet-tdt-0.6b-v2")
+
+_model = None
+
+
+def _get():
+    global _model
+    if _model is None:
+        _model = load(MODEL_ID)
+    return _model
+
 
 def preload():
-    transcribe(np.zeros(16000, dtype=np.float32))
+    return _get()
 
 
 def transcribe(audio="test.wav"):
-    if isinstance(audio, np.ndarray) and audio.dtype != np.float32:
-        audio = audio.astype(np.float32) / 32768.0
-    return mlx_whisper.transcribe(audio, path_or_hf_repo=MODEL_ID, language="en")["text"]
+    if isinstance(audio, np.ndarray):
+        if audio.dtype != np.float32:
+            audio = audio.astype(np.float32) / 32768.0
+        audio = mx.array(audio)
+    return _get().generate(audio).text
 
 
 def main(path="test.wav"):

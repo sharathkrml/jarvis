@@ -6,10 +6,12 @@ import numpy as np
 import sounddevice as sd
 from mlx_audio.tts.utils import load_model
 
+from config import env
+
 warnings.filterwarnings("ignore", message=".*torch.jit.script.*", category=FutureWarning)
 
 
-MODEL_ID = "mlx-community/Kokoro-82M-bf16"  # or .../Kokoro-82M-4bit
+MODEL_ID = env("TTS_MODEL", "mlx-community/Kokoro-82M-bf16")  # or .../Kokoro-82M-4bit
 
 _model = None
 

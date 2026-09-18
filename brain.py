@@ -2,6 +2,10 @@ from typing import Literal
 from mlx_lm import load, generate
 from pydantic import BaseModel
 
+from config import env
+
+MODEL_ID = env("LLM_MODEL", "mlx-community/Qwen3-4B-Instruct-2507-4bit")
+
 class Message(BaseModel):
     role: Literal["system", "user", "assistant"]
     content: str
@@ -11,7 +15,7 @@ _model, _tokenizer = None, None
 def _get():
     global _model, _tokenizer
     if _model is None:
-        _model, _tokenizer = load("mlx-community/Qwen3-4B-Instruct-2507-4bit")
+        _model, _tokenizer = load(MODEL_ID)
     return _model, _tokenizer
 
 def preload():
