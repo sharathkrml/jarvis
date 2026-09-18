@@ -12,6 +12,15 @@ venv/
 # audio outputs
 *.wav
 kokoro-output/
+# ...but keep the brag SFX assets that ship with the composition
+!brag-output/composition/assets/**/*.wav
 
+# agent skills (installed/generated)
+.agents/
+.opencode/
+
+# brag render artifacts (regenerate with /brag; source stays tracked)
+brag-output/
 # macos
 .DS_Store
+skills-lock.json
