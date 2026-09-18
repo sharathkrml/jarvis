@@ -43,7 +43,7 @@ Looks like this:
 | Laptop | Any Apple Silicon Mac (M1+). Vibes tuned for M1 Pro 16GB. |
 | macOS | 13 or newer. |
 | Python | **3.11**. Do NOT use 3.14 — it beefs with `mlx` and breaks the whole thing. |
-| Tool | [`uv`](https://astral.sh/uv/install.sh). Use `uv pip`, never plain old `pip`. |
+| Tool | [`uv`](https://astral.sh/uv/install.sh). Use `uv sync` / `uv run`, never plain old `pip`. |
 | System stuff | `ffmpeg` + `portaudio` from Homebrew (portaudio handles mic/speaker). |
 | Permission | Let your Terminal use the mic: System Settings → Privacy & Security → Microphone. |
 | Storage | ~4GB of model downloads. One time only, pinky promise. |
@@ -68,14 +68,11 @@ xcode-select --install
 which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
 brew install ffmpeg portaudio
 
-# 3. Make the venv (Python 3.11, pls)
+# 3. Make the venv + install everything (Python 3.11, pls)
 cd ~/Documents/Github/jarvis
-uv venv --python 3.11 .venv && source .venv/bin/activate
+uv sync
 
-# 4. Install the packages
-uv pip install mlx-lm mlx-audio sounddevice numpy scipy "misaki[en]" webrtcvad-wheels rich pydantic
-
-# 5. Make sure GPU + mic actually show up
+# 4. Make sure GPU + mic actually show up
 uv run python -c "import mlx.core as mx; print(mx.default_device())"   # should say Device(gpu, 0)
 uv run python main.py --list
 ```
@@ -149,11 +146,17 @@ jarvis/
 ├── config.py    # loads .env, small helper
 ├── jarvis.md    # OG design notes + tool-calling ideas
 ├── README.md    # you're here
+├── pyproject.toml    # the deps live here (commit it)
+├── uv.lock           # exact locked versions (commit it)
+├── .python-version   # pins Python 3.11 (commit it)
 ├── .env         # your model picks (git-ignored)
 └── .venv/       # the venv, Python 3.11 (git-ignored)
 ```
 
-No `pyproject.toml` or `requirements.txt` — everything's installed with `uv pip install`.
+Deps are declared in `pyproject.toml` and installed with `uv sync`. The other two
+generated files should be committed too: `uv.lock` locks every version + hash so
+you and CI get identical installs, and `.python-version` pins the interpreter so
+nobody drifts off 3.11. Only libraries published to PyPI git-ignore `uv.lock`.
 
 ### The files in one breath
 
@@ -200,7 +203,6 @@ No `pyproject.toml` or `requirements.txt` — everything's installed with `uv pi
 - [ ] Stream the TTS sentence-by-sentence so it talks before it's done thinking.
 - [ ] Barge-in — let you interrupt it mid-sentence.
 - [ ] Wake word, so it only wakes up when you say "Hey Jarvis".
-- [ ] Pin versions in a `requirements.txt`.
 
 ---
 
