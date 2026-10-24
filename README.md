@@ -5,7 +5,7 @@ You talk, it listens, it yaps back. All local, all on-device. Built on MLX, runs
 
 ```text
 🎤 You ──▶ VAD ──▶ STT ─────────▶ LLM ──────────▶ TTS ─────────▶ 🔊 Speaker
-          (hears   (parakeet      (Qwen3-4B        (Kokoro-82M
+          (hears   (parakeet      (Qwen3-4B        (Phonon 31M
            you)     hears words)   thinks)          speaks)
 ```
 
@@ -16,7 +16,7 @@ You talk, it listens, it yaps back. All local, all on-device. Built on MLX, runs
 1. **Listens** to you nonstop. VAD is the bouncer — it cuts the yapping when you go quiet for ~1 sec.
 2. **Types out** what you said (Parakeet, on-device).
 3. **Thinks** — a local Qwen3 model claps back in 1–2 sentences. Short and sweet, no essays.
-4. **Speaks** it out loud (Kokoro TTS).
+4. **Speaks** it out loud (Phonon by default, or Kokoro).
 5. Rinse and repeat until you say `quit` / `exit` / `shutdown` / `goodbye jarvis` or hit `Ctrl+C`.
 
 Looks like this:
@@ -118,9 +118,15 @@ So changing a model = editing `.env`. No code touched.
 ```dotenv
 LLM_MODEL=mlx-community/Qwen3-4B-Instruct-2507-4bit   # or Qwen3-1.7B-4bit for speed
 STT_MODEL=mlx-community/parakeet-tdt-0.6b-v2          # or whisper-small-mlx for tiny
-TTS_MODEL=mlx-community/Kokoro-82M-bf16               # or Kokoro-82M-4bit if memory's tight
+TTS_MODEL=gradium/phonon-31m-en
+TTS_VOICE=NbpkqMVS3CJeq2j8                            # Phonon: Zoey (English US)
+# For Kokoro instead:
+# TTS_MODEL=mlx-community/Kokoro-82M-bf16
+# TTS_VOICE=af_heart
 JARVIS_BASH=safe                                       # "full" lets Jarvis run any shell command
 ```
+
+For Phonon 31M, set `TTS_VOICE` to a voice ID from the [Phonon voice catalog](https://huggingface.co/gradium/phonon-voices). The example above selects Zoey; change the ID to try another voice. Phonon uses Gradium's `ptts` runtime; Kokoro continues to use `mlx-audio`.
 
 Other knobs, if you're feeling custom:
 
@@ -130,7 +136,8 @@ Other knobs, if you're feeling custom:
 | VAD level | `main.py` | `Vad(3)` | 0–3. Bump down to `2` in a quiet room. |
 | `SYSTEM_PROMPT` | `main.py` | short, 1–2 sentences | Its whole personality. Keep "no markdown, no lists" or it'll read bullet points out loud. |
 | `max_tokens` | `llm.py` | `512` | Max reply length. 100–150 = fast answers. |
-| `voice` / `speed` / `lang_code` | `tts.py` | `af_heart` / `1.0` / `a` | Which voice, how fast, what language. |
+| `TTS_VOICE` | `.env` | `default` (Phonon) / `af_heart` (Kokoro) | Voice name or Phonon voice ID passed to the TTS model. |
+| `speed` / `lang_code` | `tts.py` | `1.0` / `a` | Kokoro speech rate and language code. Phonon 31M speaks English. |
 
 > Laggy replies? Switch the LLM to 1.7B → drop `max_tokens` to 100–150 → try the 4-bit TTS. In that order.
 
@@ -143,7 +150,7 @@ jarvis/
 ├── main.py      # the voice loop + the pretty terminal UI
 ├── llm.py       # the brain (Qwen3 via mlx-lm)
 ├── stt.py       # the ears (Parakeet)
-├── tts.py       # the mouth (Kokoro)
+├── tts.py       # the mouth (Phonon or Kokoro)
 ├── config.py    # loads .env, small helper
 ├── jarvis.md    # OG design notes + tool-calling ideas
 ├── README.md    # you're here
@@ -164,7 +171,7 @@ nobody drifts off 3.11. Only libraries published to PyPI git-ignore `uv.lock`.
 - **`main.py`** — loops forever. Feeds little 30ms chunks of audio to `webrtcvad`, waits for silence, then runs it through the whole chain. Also prints the nice panels.
 - **`llm.py`** — loads Qwen3 once and keeps it. `chat(messages)` applies the chat template and returns its answer.
 - **`stt.py`** — takes an audio array (or a file) and returns text. Handles the int16 → float32 conversion for you.
-- **`tts.py`** — loads Kokoro, does a throwaway "hi" so the first real reply is instant, then plays back each chunk.
+- **`tts.py`** — loads Phonon or Kokoro, warms up the selected voice, then plays back generated audio.
 - **`config.py`** — reads `.env`, ignores comments and blanks, hands values to the rest of the app.
 
 ---
@@ -177,7 +184,7 @@ nobody drifts off 3.11. Only libraries published to PyPI git-ignore `uv.lock`.
 | LLM backup | `mlx-community/Qwen3-1.7B-4bit` | ~1.1GB | When 4B is too slow |
 | STT | `mlx-community/parakeet-tdt-0.6b-v2` | ~1.2GB | Turns speech into text |
 | STT backup | `mlx-community/whisper-small-mlx` | ~290MB | Smaller, faster |
-| TTS | `mlx-community/Kokoro-82M-bf16` | ~300MB | The voice |
+| TTS | `gradium/phonon-31m-en` | ~65MB (q8) | The voice |
 | VAD | `webrtcvad` | ~2MB | Detects when you stop talking |
 
 ---

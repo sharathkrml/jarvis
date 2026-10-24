@@ -15,4 +15,5 @@ dependencies = [
     "rich",
     "sounddevice",
     "webrtcvad-wheels",
+    "ptts>=0.4.1",
 ]
