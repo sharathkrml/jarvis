@@ -11,7 +11,7 @@ from config import env
 warnings.filterwarnings("ignore", message=".*torch.jit.script.*", category=FutureWarning)
 
 
-MODEL_ID = env("TTS_MODEL", "gradium/phonon-40m-en")  # or .../Kokoro-82M-4bit
+MODEL_ID = env("TTS_MODEL", "gradium/phonon-31m-en")  # or .../Kokoro-82M-4bit
 
 _model = None
 
