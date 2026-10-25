@@ -35,6 +35,7 @@ def preload():
         if PHONON_MODEL:
             model_id = MODEL_ID if MODEL_ID.startswith("hf://") else f"hf://{MODEL_ID}"
             _model = ptts.TTS(model_id, lang="en", quant="q8")
+            print(f"Loaded Phonon model {MODEL_ID} with voice {DEFAULT_VOICE}.")
             with _model.stream("hi", voice=DEFAULT_VOICE) as audio:
                 next(iter(audio), None)
         else:

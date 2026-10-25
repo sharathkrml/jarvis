@@ -86,12 +86,13 @@ The model downloads happen automatically the first run and live in `~/.cache/hug
 ## Running it
 
 ```bash
-source .venv/bin/activate
-
-python main.py          # your default mic
-python main.py 1        # mic #1, if you have a million
-python main.py --list   # show all your audio devices
+make run                # your default mic
+make run DEVICE=1       # mic #1, if you have a million
+make devices            # show all your audio devices
 ```
+
+Run `make` to see all available targets. For example, `make tts TEXT="Systems online."`
+speaks a test phrase, and `make stt FILE=test.wav` transcribes a WAV file.
 
 How to not be confused:
 - Talk, then **go quiet for ~1 sec**. That's how it knows you're done.
@@ -101,10 +102,10 @@ How to not be confused:
 ### Poke at each piece separately
 
 ```bash
-python stt.py test.wav            # transcribe a wav file
-python llm.py                     # ask the brain one thing
-python tts.py "Systems online."   # make it say something
-python config.py                  # check .env is loading
+make stt FILE=test.wav            # transcribe a wav file
+make llm                          # ask the brain one thing
+make tts TEXT="Systems online."   # make it say something
+make config                       # check .env is loading
 ```
 
 ---
