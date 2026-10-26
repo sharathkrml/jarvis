@@ -73,7 +73,7 @@ def main(device=None):
             continue
         console.print(Panel(text, title="You", border_style="blue", expand=False))
         if text.lower().strip(" .!") in ("quit", "exit", "shutdown", "goodbye jarvis"):
-            bye = "Shutting down. Goodbye."
+            bye = "Shutting down. Goodbye!"
             console.print(Panel(bye, title="Jarvis", border_style="green", expand=False))
             speak(bye)
             break
